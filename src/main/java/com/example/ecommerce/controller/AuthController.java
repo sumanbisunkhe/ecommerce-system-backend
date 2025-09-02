@@ -1,16 +1,15 @@
 package com.example.ecommerce.controller;
 
 
-import com.example.ecommerce.entity.dto.ApiResponse;
-import com.example.ecommerce.entity.dto.AuthRequest;
-import com.example.ecommerce.entity.dto.AuthResponse;
-import com.example.ecommerce.entity.dto.UserDto;
+import com.example.ecommerce.dto.ApiResponse;
+import com.example.ecommerce.dto.AuthRequest;
+import com.example.ecommerce.dto.AuthResponse;
+import com.example.ecommerce.dto.UserDto;
 import com.example.ecommerce.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

@@ -1,8 +1,6 @@
 package com.example.ecommerce.repository;
 
 import com.example.ecommerce.entity.User;
-import com.example.ecommerce.entity.dto.UserDto;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

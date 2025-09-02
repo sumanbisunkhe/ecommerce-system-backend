@@ -1,10 +1,10 @@
 package com.example.ecommerce.service.impl;
 
 import com.example.ecommerce.entity.User;
-import com.example.ecommerce.entity.dto.AuthRequest;
-import com.example.ecommerce.entity.dto.AuthResponse;
-import com.example.ecommerce.entity.dto.UserDto;
-import com.example.ecommerce.entity.mapper.UserMapper;
+import com.example.ecommerce.dto.AuthRequest;
+import com.example.ecommerce.dto.AuthResponse;
+import com.example.ecommerce.dto.UserDto;
+import com.example.ecommerce.mapper.UserMapper;
 import com.example.ecommerce.exceptions.ResourceNotFoundException;
 import com.example.ecommerce.repository.UserRepository;
 import com.example.ecommerce.security.CustomUserDetails;

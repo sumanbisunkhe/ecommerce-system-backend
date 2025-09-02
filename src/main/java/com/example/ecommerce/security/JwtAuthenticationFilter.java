@@ -1,6 +1,6 @@
 package com.example.ecommerce.security;
 
-import com.example.ecommerce.entity.dto.ApiResponse;
+import com.example.ecommerce.dto.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

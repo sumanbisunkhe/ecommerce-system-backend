@@ -1,7 +1,7 @@
-package com.example.ecommerce.entity.mapper;
+package com.example.ecommerce.mapper;
 
 import com.example.ecommerce.entity.User;
-import com.example.ecommerce.entity.dto.UserDto;
+import com.example.ecommerce.dto.UserDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

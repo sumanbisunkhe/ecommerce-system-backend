@@ -1,6 +1,6 @@
 package com.example.ecommerce.exceptions;
 
-import com.example.ecommerce.entity.dto.ApiResponse;
+import com.example.ecommerce.dto.ApiResponse;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
