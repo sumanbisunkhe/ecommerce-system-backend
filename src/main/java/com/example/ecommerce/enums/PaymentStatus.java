@@ -2,7 +2,7 @@ package com.example.ecommerce.enums;
 
 public enum PaymentStatus {
     PENDING,
-    PAID,
+    COMPLETED,
     FAILED,
     REFUNDED
 }
