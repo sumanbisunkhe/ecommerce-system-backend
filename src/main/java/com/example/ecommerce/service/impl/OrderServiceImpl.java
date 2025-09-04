@@ -10,6 +10,7 @@ import com.example.ecommerce.enums.PaymentStatus;
 import com.example.ecommerce.mapper.OrderMapper;
 import com.example.ecommerce.repository.CartRepository;
 import com.example.ecommerce.repository.OrderRepository;
+import com.example.ecommerce.repository.UserRepository;
 import com.example.ecommerce.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final CartRepository cartRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -82,6 +84,16 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
         return orderMapper.toDto(order);
+    }
+
+    @Override
+    public Page<OrderDto> getOrdersByUserId(Long userId, Pageable pageable) {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new IllegalArgumentException("User not found with id " + userId);
+        }
+        Page<Order> ordersByUserId = orderRepository.findOrdersByUserId(userId,pageable);
+        return ordersByUserId.map(orderMapper::toDto);
+
     }
 
     @Override

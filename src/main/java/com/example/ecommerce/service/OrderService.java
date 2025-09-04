@@ -6,8 +6,14 @@ import org.springframework.data.domain.Pageable;
 
 public interface OrderService {
     OrderDto createOrder(OrderDto dto);
+
     OrderDto getOrderById(Long id);
+
+    Page<OrderDto> getOrdersByUserId(Long userId, Pageable pageable);
+
     Page<OrderDto> getAllOrders(String filter, Pageable pageable);
+
     OrderDto updateOrderStatus(Long id, String status);
+
     void deleteOrder(Long id);
 }

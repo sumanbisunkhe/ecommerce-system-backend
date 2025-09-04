@@ -26,6 +26,13 @@ public class OrderController {
         return ResponseEntity.ok(ApiResponse.success("Order fetched successfully", orderService.getOrderById(id)));
     }
 
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<ApiResponse<Page<OrderDto>>> getOrdersByUser(@PathVariable Long userId, Pageable pageable) {
+
+        Page<OrderDto> orders = orderService.getOrdersByUserId(userId, pageable);
+        return ResponseEntity.ok(ApiResponse.success("Orders fetched successfully", orders));
+    }
+
     @GetMapping
     public ResponseEntity<ApiResponse<Page<OrderDto>>> getAllOrders(
             @RequestParam(defaultValue = "ALL") String filter,

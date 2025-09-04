@@ -9,11 +9,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
-    
+
     @Query("SELECT p FROM Product p " +
             "WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
@@ -38,5 +40,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("categoryId") Long categoryId,
             Pageable pageable
     );
+
+    @Query("SELECT p FROM Product p WHERE p.category.id IN :categoryIds")
+    List<Product> findTopByCategoryIds(@Param("categoryIds") List<Long> categoryIds, Pageable pageable);
 
 }
