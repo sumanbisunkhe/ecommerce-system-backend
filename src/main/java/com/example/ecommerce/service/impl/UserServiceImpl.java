@@ -1,5 +1,6 @@
 package com.example.ecommerce.service.impl;
 
+import com.example.ecommerce.dto.UpdateUserDto;
 import com.example.ecommerce.entity.User;
 import com.example.ecommerce.dto.AuthRequest;
 import com.example.ecommerce.dto.AuthResponse;
@@ -47,6 +48,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(rawPassword));
+        user.setActive(dto.isActive());
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
 
@@ -113,7 +115,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserDto updateUser(Long id, UserDto dto) {
+    public UpdateUserDto updateUser(Long id, UpdateUserDto dto) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
@@ -124,11 +126,9 @@ public class UserServiceImpl implements UserService {
         existing.setGender(dto.getGender());
         existing.setAddress(dto.getAddress());
         existing.setCountry(dto.getCountry());
-        existing.setProfilePictureUrl(dto.getProfilePictureUrl());
-        existing.setRoles(dto.getRoles());
         existing.setUpdatedAt(LocalDateTime.now());
 
-        return userMapper.toDto(userRepository.save(existing));
+        return userMapper.toUpdateUserDto(userRepository.save(existing));
     }
 
     @Override

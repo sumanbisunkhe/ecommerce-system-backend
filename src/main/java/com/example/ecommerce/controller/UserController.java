@@ -2,6 +2,7 @@ package com.example.ecommerce.controller;
 
 
 import com.example.ecommerce.dto.ApiResponse;
+import com.example.ecommerce.dto.UpdateUserDto;
 import com.example.ecommerce.dto.UserDto;
 import com.example.ecommerce.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,7 @@ public class UserController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "updatedAt") String sortBy,
-            @RequestParam(defaultValue = "true") boolean ascending
+            @RequestParam(defaultValue = "false") boolean ascending
     ) {
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -73,7 +74,7 @@ public class UserController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserDto>> updateUser(@PathVariable Long id, @RequestBody UserDto dto) {
+    public ResponseEntity<ApiResponse<UpdateUserDto>> updateUser(@PathVariable Long id, @RequestBody UpdateUserDto dto) {
         return ResponseEntity.ok(
                 ApiResponse.success("User updated successfully", userService.updateUser(id, dto))
         );
