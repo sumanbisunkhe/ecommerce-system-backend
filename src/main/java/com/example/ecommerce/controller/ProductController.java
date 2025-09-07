@@ -40,7 +40,7 @@ public class ProductController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<ApiResponse<?>> getAllProducts(
             @RequestParam("search") Optional<String> search,
             @RequestParam(defaultValue = "1") int page,
