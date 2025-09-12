@@ -1,6 +1,7 @@
 package com.example.ecommerce.repository;
 
 import com.example.ecommerce.entity.OrderItem;
+import com.example.ecommerce.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -37,4 +38,20 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     List<Long> findSimilarProducts(@Param("userId") Long userId,
                                    @Param("purchasedProductIds") List<Long> purchasedProductIds);
 
+
+    // NEW: Find top 5 most bought products by quantity
+    @Query("SELECT p FROM Product p " +
+            "WHERE p.id IN (" +
+            "    SELECT oi.product.id FROM OrderItem oi " +
+            "    GROUP BY oi.product.id " +
+            "    ORDER BY SUM(oi.quantity) DESC " +
+            "    LIMIT 5" +
+            ")")
+    List<Product> findTop5ProductsByQuantity();
+
+    // NEW: Find order items by order ID
+    List<OrderItem> findByOrderId(Long orderId);
+
+    // NEW: Find order items by product ID
+    List<OrderItem> findByProductId(Long productId);
 }

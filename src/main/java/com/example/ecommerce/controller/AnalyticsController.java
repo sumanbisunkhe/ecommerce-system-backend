@@ -1,14 +1,14 @@
 package com.example.ecommerce.controller;
 
-import com.example.ecommerce.dto.AnalyticsDashboardDto;
-import com.example.ecommerce.dto.AnalyticsDto;
 import com.example.ecommerce.dto.ApiResponse;
-import com.example.ecommerce.enums.AnalyticsType;
+import com.example.ecommerce.dto.AnalyticsDto;
 import com.example.ecommerce.service.AnalyticsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -18,32 +18,30 @@ public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<AnalyticsDto>> createAnalytics(@RequestBody AnalyticsDto dto) {
-        return ResponseEntity.ok(ApiResponse.success("Analytics created", analyticsService.createAnalytics(dto)));
+    @GetMapping("/system")
+    public ResponseEntity<ApiResponse<AnalyticsDto>> getSystemAnalytics() {
+        AnalyticsDto analytics = analyticsService.getSystemAnalytics();
+        return ResponseEntity.ok(ApiResponse.success("System analytics retrieved successfully", analytics));
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<AnalyticsDto>>> getAllAnalytics() {
-        return ResponseEntity.ok(ApiResponse.success("All analytics fetched", analyticsService.getAllAnalytics()));
+    @GetMapping("/date/{date}")
+    public ResponseEntity<ApiResponse<AnalyticsDto>> getAnalyticsByDate(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        AnalyticsDto analytics = analyticsService.getAnalyticsByDate(date);
+        return ResponseEntity.ok(ApiResponse.success("Analytics retrieved successfully", analytics));
     }
 
-    @GetMapping("/type/{type}")
-    public ResponseEntity<ApiResponse<List<AnalyticsDto>>> getAnalyticsByType(@PathVariable AnalyticsType type) {
-        return ResponseEntity.ok(ApiResponse.success("Analytics by type fetched", analyticsService.getAnalyticsByType(type)));
+    @GetMapping("/range")
+    public ResponseEntity<ApiResponse<List<AnalyticsDto>>> getAnalyticsByDateRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        List<AnalyticsDto> analytics = analyticsService.getAnalyticsByDateRange(startDate, endDate);
+        return ResponseEntity.ok(ApiResponse.success("Analytics retrieved successfully", analytics));
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<String>> refreshAnalytics() {
-        analyticsService.refreshAnalytics();
-        return ResponseEntity.ok(ApiResponse.success("Analytics refreshed", "All metrics recalculated successfully"));
+    @PostMapping("/generate-daily")
+    public ResponseEntity<ApiResponse<AnalyticsDto>> generateDailyAnalytics() {
+        AnalyticsDto analytics = analyticsService.generateDailyAnalytics();
+        return ResponseEntity.ok(ApiResponse.success("Daily analytics generated successfully", analytics));
     }
-
-    @GetMapping("/dashboard")
-    public ResponseEntity<ApiResponse<AnalyticsDashboardDto>> getDashboardAnalytics() {
-        return ResponseEntity.ok(
-                ApiResponse.success("Dashboard analytics fetched", analyticsService.getDashboardAnalytics())
-        );
-    }
-
 }

@@ -25,4 +25,8 @@ public interface UserService {
     void deleteUser(Long id);
 
     UserDto getUserByUsername(String username);
+
+    void changePassword(Long userId, String oldPassword, String newPassword);
+
+    void changeUserStatus(Long userId);
 }

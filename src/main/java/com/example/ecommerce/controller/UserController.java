@@ -2,6 +2,7 @@ package com.example.ecommerce.controller;
 
 
 import com.example.ecommerce.dto.ApiResponse;
+import com.example.ecommerce.dto.ChangePasswordDto;
 import com.example.ecommerce.dto.UpdateUserDto;
 import com.example.ecommerce.dto.UserDto;
 import com.example.ecommerce.service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -93,4 +95,35 @@ public class UserController {
         UserDto updatedUser = userService.uploadProfilePicture(id, file);
         return ResponseEntity.ok(ApiResponse.success("Profile picture uploaded successfully", updatedUser));
     }
+    @PutMapping("/{userId}/change-password")
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @PathVariable Long userId,
+            @RequestBody ChangePasswordDto request
+    ) {
+        try {
+            userService.changePassword(userId, request.getOldPassword(), request.getNewPassword());
+            return ResponseEntity.ok(ApiResponse.success("Password changed successfully", null));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.error("Something went wrong: " + ex.getMessage()));
+        }
+    }
+
+    @PutMapping("/{userId}/toggle-status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> changeUserStatus(@PathVariable Long userId) {
+        try {
+            userService.changeUserStatus(userId);
+            return ResponseEntity.ok(ApiResponse.success("User status updated successfully", null));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.error("Something went wrong: " + ex.getMessage()));
+        }
+    }
+
 }

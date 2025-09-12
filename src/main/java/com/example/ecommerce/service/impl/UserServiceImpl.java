@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -91,7 +92,6 @@ public class UserServiceImpl implements UserService {
                 .user(userMapper.toDto(user))
                 .build();
     }
-
 
 
     @Override
@@ -167,5 +167,30 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
     }
+
+    @Override
+    public void changePassword(Long userId, String oldPassword, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "ID", userId));
+
+        if(!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("Old password doesn't match");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+
+    @Override
+    public void changeUserStatus(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "ID", userId));
+
+        user.setActive(!user.isActive());
+
+        userRepository.save(user);
+    }
+
 
 }

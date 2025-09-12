@@ -133,33 +133,29 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     @Override
     public Map<String, String> uploadImage(MultipartFile file, String directory) throws IOException {
-        if (file.isEmpty()) {
-            throw new IOException("Failed to store empty file");
-        }
+        if (file.isEmpty()) throw new IOException("Failed to store empty file");
+
+        File uploadedFile = convertMultiPartToFile(file);
 
         try {
-            // Convert MultipartFile to File
-            File uploadedFile = convertMultiPartToFile(file);
-            
-            // Upload to Cloudinary
-            Map<String, Object> params = ObjectUtils.asMap(
-                "folder", directory,
-                "resource_type", "auto"
+            String uniqueId = UUID.randomUUID().toString();
+
+            Map params = ObjectUtils.asMap(
+                    "folder", directory,
+                    "public_id", uniqueId,
+                    "overwrite", true,
+                    "resource_type", "auto"
             );
-            
+
             Map uploadResult = cloudinary.uploader().upload(uploadedFile, params);
-            log.info("Image uploaded to Cloudinary successfully: {}", uploadResult.get("secure_url"));
-            
-            // Delete the local file after upload
             uploadedFile.delete();
-            
-            // Return image details
+
             Map<String, String> result = new HashMap<>();
             result.put("secure_url", (String) uploadResult.get("secure_url"));
             result.put("url", (String) uploadResult.get("url"));
             result.put("publicId", (String) uploadResult.get("public_id"));
             result.put("originalFilename", file.getOriginalFilename());
-            
+
             return result;
         } catch (Exception e) {
             log.error("Error uploading image to Cloudinary: {}", e.getMessage(), e);

@@ -8,6 +8,7 @@ import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -51,6 +52,14 @@ public class CategoryController {
                 ApiResponse.success("Categories retrieved successfully", categories)
         );
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<?>> getAllCategories(){
+        List<CategoryDto> allCategories = categoryService.getAllCategories();
+        return ResponseEntity.ok(ApiResponse.success("Categories retrieved successfully", allCategories));
+    }
+
+
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<CategoryDto>> updateCategory(@PathVariable Long id, @RequestBody CategoryDto dto) {

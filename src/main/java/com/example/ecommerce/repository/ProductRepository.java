@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -44,4 +45,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.category.id IN :categoryIds")
     List<Product> findTopByCategoryIds(@Param("categoryIds") List<Long> categoryIds, Pageable pageable);
 
+    // NEW: Find top 5 newest products
+    List<Product> findTop5ByOrderByCreatedAtDesc();
+
+    // NEW: Find active products
+    List<Product> findByActiveTrue();
+
+    // NEW: Find inactive products
+    List<Product> findByActiveFalse();
 }

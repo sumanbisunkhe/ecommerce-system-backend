@@ -26,12 +26,14 @@ public class ProductController {
     @PreAuthorize("hasAnyRole('ADMIN','MERCHANT')")
     public ResponseEntity<ApiResponse<ProductDto>> createProductWithImage(
             @RequestPart("product") ProductDto dto,
-            @RequestPart("image") MultipartFile image) throws IOException {
+            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+
         return ResponseEntity.ok(
                 ApiResponse.success("Product created successfully",
                         productService.createProduct(dto, image))
         );
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ProductDto>> getProduct(@PathVariable Long id) {
@@ -79,12 +81,13 @@ public class ProductController {
     public ResponseEntity<ApiResponse<ProductDto>> updateProduct(
             @PathVariable Long id,
             @RequestPart("product") ProductDto dto,
-            @RequestPart("image") MultipartFile image) throws IOException {
+            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
         return ResponseEntity.ok(
                 ApiResponse.success("Product updated successfully",
                         productService.updateProduct(id, dto, image))
         );
     }
+
 
     @PreAuthorize("hasAnyRole('ADMIN','MERCHANT')")
     @DeleteMapping("/{id}")

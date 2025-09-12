@@ -10,12 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,18 +27,27 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final FileUploadService fileUploadService;
 
+    @Transactional
     @Override
     public ProductDto createProduct(ProductDto dto, MultipartFile image) throws IOException {
+        // Map DTO to entity
         Product product = productMapper.toEntity(dto);
+
+        // Ensure ID is null so DB auto-generates it
+        product.setId(null);
         product.setUpdatedAt(LocalDateTime.now());
-        
+
+        // Handle image upload if provided
         if (image != null && !image.isEmpty()) {
-            Map<String, String> uploadResult = fileUploadService.uploadImage(image, "products");
+            String uniquePublicId = "products/" + UUID.randomUUID();
+            Map<String, String> uploadResult = fileUploadService.uploadImage(image, uniquePublicId);
             product.setImageUrl(uploadResult.get("secure_url"));
         }
-        
-        return productMapper.toDto(productRepository.save(product));
+
+        Product saved = productRepository.save(product);
+        return productMapper.toDto(saved);
     }
+
 
     @Override
     public ProductDto getProductById(Long id) {
@@ -83,27 +94,37 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
+    @Transactional
     @Override
     public ProductDto updateProduct(Long id, ProductDto dto, MultipartFile image) throws IOException {
+        // Fetch existing product
         Product existing = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
 
-        existing.setName(dto.getName());
-        existing.setDescription(dto.getDescription());
-        existing.setPrice(dto.getPrice());
-        existing.setStockQuantity(dto.getStockQuantity());
-        existing.setActive(dto.getActive());
-        
+        // Update fields only if provided
+        if (dto.getName() != null) existing.setName(dto.getName());
+        if (dto.getDescription() != null) existing.setDescription(dto.getDescription());
+        if (dto.getPrice() != null) existing.setPrice(dto.getPrice());
+        if (dto.getStockQuantity() != null) existing.setStockQuantity(dto.getStockQuantity());
+        if (dto.getActive() != null) existing.setActive(dto.getActive());
+
+        // Update image if provided
         if (image != null && !image.isEmpty()) {
-            Map<String, String> uploadResult = fileUploadService.uploadImage(image, "products");
+            String uniquePublicId = "products/" + UUID.randomUUID();
+            Map<String, String> uploadResult = fileUploadService.uploadImage(image, uniquePublicId);
             existing.setImageUrl(uploadResult.get("secure_url"));
-        } else {
+        }
+        // Only update imageUrl from DTO if explicitly provided
+        else if (dto.getImageUrl() != null && !dto.getImageUrl().isEmpty()) {
             existing.setImageUrl(dto.getImageUrl());
         }
-        
+
+        // Update category if provided
         if (dto.getCategoryId() != null) {
             existing.setCategory(productMapper.mapCategory(dto.getCategoryId()));
         }
+
+        // Update timestamp
         existing.setUpdatedAt(LocalDateTime.now());
 
         return productMapper.toDto(productRepository.save(existing));
