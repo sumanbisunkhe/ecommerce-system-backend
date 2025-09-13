@@ -45,4 +45,8 @@ public class Order extends BaseEntity {
 
     @Column(length = 255)
     private String shippingAddress;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal shippingCost;
+
 }

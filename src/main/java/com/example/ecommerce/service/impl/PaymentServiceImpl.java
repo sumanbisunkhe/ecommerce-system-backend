@@ -37,7 +37,7 @@ public class PaymentServiceImpl implements PaymentService {
                 String.valueOf(order.getId()),
                 "Order-" + order.getId(),
                 order.getTotalAmount().intValue(),
-                order.getUser() // dynamically pass the user
+                order.getUser()
         );
 
         Payment payment = Payment.builder()

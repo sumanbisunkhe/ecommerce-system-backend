@@ -45,6 +45,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setUser(cart.getUser());
         order.setShippingAddress(dto.getShippingAddress());
+        order.setShippingCost(new BigDecimal(100));
         order.setStatus(OrderStatus.PENDING);
         order.setPaymentStatus(PaymentStatus.PENDING);
 
@@ -64,7 +65,7 @@ public class OrderServiceImpl implements OrderService {
             order.getItems().add(orderItem);
         }
 
-        order.setTotalAmount(totalAmount);
+        order.setTotalAmount(totalAmount.add(order.getShippingCost()));
 
         // 3. Save order
         Order savedOrder = orderRepository.save(order);
@@ -91,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
         if (userRepository.findById(userId).isEmpty()) {
             throw new IllegalArgumentException("User not found with id " + userId);
         }
-        Page<Order> ordersByUserId = orderRepository.findOrdersByUserId(userId,pageable);
+        Page<Order> ordersByUserId = orderRepository.findOrdersByUserIdOrderByUpdatedAtDesc(userId,pageable);
         return ordersByUserId.map(orderMapper::toDto);
 
     }
@@ -113,10 +114,10 @@ public class OrderServiceImpl implements OrderService {
                 break;
             case "ALL":
             default:
-                return orderRepository.findAll(pageable).map(orderMapper::toDto);
+                return orderRepository.findAllByOrderByUpdatedAtDesc(pageable).map(orderMapper::toDto);
         }
 
-        return orderRepository.findByCreatedAtBetween(startDate, now, pageable)
+        return orderRepository.findByCreatedAtBetweenOrderByUpdatedAtDesc(startDate, now, pageable)
                 .map(orderMapper::toDto);
     }
 
@@ -127,6 +128,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
 
         order.setStatus(OrderStatus.valueOf(status.toUpperCase()));
+        order.setShippingCost(new BigDecimal(100));
         return orderMapper.toDto(orderRepository.save(order));
     }
 

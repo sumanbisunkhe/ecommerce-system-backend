@@ -18,4 +18,5 @@ public class OrderDto {
     private OrderStatus status;
     private PaymentStatus paymentStatus;
     private String shippingAddress;
+    private BigDecimal shippingCost;
 }
