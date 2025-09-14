@@ -28,6 +28,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
     private final KhaltiService khaltiService;
 
+    @Transactional
     @Override
     public PaymentInitiateResponse initiatePayment(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -72,6 +73,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         return lookupResponse;
     }
+
 
     @Override
     public void handleCallback(PaymentCallbackResponse callbackResponse) {

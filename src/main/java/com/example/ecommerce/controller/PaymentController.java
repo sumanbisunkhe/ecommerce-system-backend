@@ -33,7 +33,7 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success("Payment verified", response));
     }
 
-    @PostMapping("/khalti/callback")
+    @GetMapping("/khalti/callback")
     public ResponseEntity<ApiResponse<PaymentCallbackResponse>> handleCallback(
             @RequestParam String pidx) {
 

@@ -14,9 +14,10 @@ public class OrderDto {
     private Long id;
     private Long userId;
     private Set<OrderItemDto> items;
-    private BigDecimal totalAmount;
     private OrderStatus status;
     private PaymentStatus paymentStatus;
     private String shippingAddress;
     private BigDecimal shippingCost;
+    private BigDecimal subtotal;
+    private BigDecimal totalAmount;
 }

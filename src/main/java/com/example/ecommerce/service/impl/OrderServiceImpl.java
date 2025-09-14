@@ -65,6 +65,7 @@ public class OrderServiceImpl implements OrderService {
             order.getItems().add(orderItem);
         }
 
+        order.setSubtotal(totalAmount);
         order.setTotalAmount(totalAmount.add(order.getShippingCost()));
 
         // 3. Save order
@@ -128,7 +129,6 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
 
         order.setStatus(OrderStatus.valueOf(status.toUpperCase()));
-        order.setShippingCost(new BigDecimal(100));
         return orderMapper.toDto(orderRepository.save(order));
     }
 

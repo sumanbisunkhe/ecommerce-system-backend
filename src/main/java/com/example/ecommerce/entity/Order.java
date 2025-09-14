@@ -32,8 +32,7 @@ public class Order extends BaseEntity {
     @Builder.Default
     private Set<OrderItem> items = new HashSet<>();
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal totalAmount;
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,4 +48,10 @@ public class Order extends BaseEntity {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal shippingCost;
 
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal subtotal = BigDecimal.ZERO;
+
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalAmount;
 }

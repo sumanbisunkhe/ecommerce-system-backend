@@ -14,6 +14,8 @@ public interface OrderMapper {
     OrderDto toDto(Order order);
 
     @Mapping(source = "userId", target = "user.id")
+    @Mapping(target = "subtotal", ignore = true)
+    @Mapping(target = "totalAmount", ignore = true)
     Order toEntity(OrderDto dto);
 
     @Mapping(source = "product.id", target = "productId")
