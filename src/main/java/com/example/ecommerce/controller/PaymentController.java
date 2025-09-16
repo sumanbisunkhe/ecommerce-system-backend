@@ -73,5 +73,23 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success("Payments fetched", payments));
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse<Page<Payment>>> getUserPayments(
+            @PathVariable Long userId,
+            @RequestParam(required = false, defaultValue = "ALL") String filter,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "updatedAt") String sortBy,
+            @RequestParam(defaultValue = "false") boolean ascending
+    ) {
+        Pageable pageable = PageRequest.of(
+                page - 1,
+                size,
+                ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending()
+        );
+
+        Page<Payment> payments = paymentService.getUserPayments(userId, filter, pageable);
+        return ResponseEntity.ok(ApiResponse.success("User payments fetched", payments));
+    }
 
 }

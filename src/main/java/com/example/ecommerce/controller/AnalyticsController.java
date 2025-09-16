@@ -2,6 +2,7 @@ package com.example.ecommerce.controller;
 
 import com.example.ecommerce.dto.ApiResponse;
 import com.example.ecommerce.dto.AnalyticsDto;
+import com.example.ecommerce.dto.UserAnalyticsDto;
 import com.example.ecommerce.service.AnalyticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -44,4 +45,11 @@ public class AnalyticsController {
         AnalyticsDto analytics = analyticsService.generateDailyAnalytics();
         return ResponseEntity.ok(ApiResponse.success("Daily analytics generated successfully", analytics));
     }
+
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<ApiResponse<UserAnalyticsDto>> getUserAnalytics(@PathVariable Long userId) {
+        UserAnalyticsDto userAnalytics = analyticsService.getUserAnalytics(userId);
+        return ResponseEntity.ok(ApiResponse.success("User analytics retrieved successfully", userAnalytics));
+    }
+
 }

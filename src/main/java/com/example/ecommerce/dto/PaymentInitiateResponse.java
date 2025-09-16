@@ -1,8 +1,10 @@
 package com.example.ecommerce.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class PaymentInitiateResponse {
     private String pidx;
     private String payment_url;

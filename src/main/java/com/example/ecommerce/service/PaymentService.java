@@ -17,4 +17,6 @@ public interface PaymentService {
     Payment getPaymentById(Long id);
 
     Page<Payment> getAllPayments(String filter, Pageable pageable);
+
+    Page<Payment> getUserPayments(Long userId, String filter, Pageable pageable);
 }

@@ -3,6 +3,7 @@ package com.example.ecommerce.service.impl;
 import com.example.ecommerce.dto.AnalyticsDto;
 import com.example.ecommerce.dto.CategoryDto;
 import com.example.ecommerce.dto.ProductDto;
+import com.example.ecommerce.dto.UserAnalyticsDto;
 import com.example.ecommerce.entity.*;
 import com.example.ecommerce.enums.Gender;
 import com.example.ecommerce.enums.OrderStatus;
@@ -20,7 +21,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -129,6 +130,115 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         }
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserAnalyticsDto getUserAnalytics(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        return buildUserAnalyticsDto(user);
+    }
+
+    private UserAnalyticsDto buildUserAnalyticsDto(User user) {
+        List<Order> userOrders = orderRepository.findByUser(user);
+        List<Payment> userPayments = paymentRepository.findByUser(user);
+        Optional<Cart> userCart = cartRepository.findByUser(user);
+
+        // Calculate orders in last 30 days
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        int ordersLast30Days = (int) userOrders.stream()
+                .filter(order -> order.getCreatedAt().isAfter(thirtyDaysAgo))
+                .count();
+
+        // Calculate total spent from completed payments
+        BigDecimal totalSpent = userPayments.stream()
+                .filter(payment -> payment.getStatus() == PaymentStatus.COMPLETED)
+                .map(Payment::getAmount)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Get last order
+        Optional<Order> lastOrder = userOrders.stream()
+                .max(Comparator.comparing(Order::getCreatedAt));
+
+        // Calculate average order value
+        BigDecimal averageOrderValue = userOrders.isEmpty() ? BigDecimal.ZERO :
+                totalSpent.divide(BigDecimal.valueOf(userOrders.size()), 2, BigDecimal.ROUND_HALF_UP);
+
+        // Get favorite categories
+        List<String> favoriteCategories = getFavoriteCategories(user);
+
+        // Determine loyalty tier based on total spent
+        String loyaltyTier = determineLoyaltyTier(totalSpent);
+
+        return UserAnalyticsDto.builder()
+                .isActive(user.isActive())
+                .joinedDate(user.getCreatedAt())
+
+                // Order summary
+                .totalOrders(userOrders.size())
+                .pendingOrders((int) userOrders.stream().filter(o -> o.getStatus() == OrderStatus.PENDING).count())
+                .deliveredOrders((int) userOrders.stream().filter(o -> o.getStatus() == OrderStatus.DELIVERED).count())
+                .cancelledOrders((int) userOrders.stream().filter(o -> o.getStatus() == OrderStatus.CANCELLED).count())
+
+                // Financial summary
+                .totalSpent(totalSpent)
+                .averageOrderValue(averageOrderValue)
+                .lastOrderAmount(lastOrder.map(Order::getTotalAmount).orElse(BigDecimal.ZERO))
+                .lastOrderDate(lastOrder.map(Order::getCreatedAt).orElse(null))
+
+                // Current cart status
+                .cartItemsCount(userCart.map(cart -> cart.getItems().size()).orElse(0))
+                .cartTotalValue(userCart.map(Cart::getTotalPrice).orElse(BigDecimal.ZERO))
+
+                // Payment summary
+                .totalPayments(userPayments.size())
+                .successfulPayments((int) userPayments.stream().filter(p -> p.getStatus() == PaymentStatus.COMPLETED).count())
+                .failedPayments((int) userPayments.stream().filter(p -> p.getStatus() == PaymentStatus.FAILED).count())
+
+                // Favorite categories
+                .favoriteCategories(favoriteCategories)
+
+                // Activity metrics
+                .loyaltyTier(loyaltyTier)
+                .ordersLast30Days(ordersLast30Days)
+                .build();
+    }
+
+    private List<String> getFavoriteCategories(User user) {
+        List<Order> userOrders = orderRepository.findByUser(user);
+
+        // Count category occurrences
+        Map<String, Integer> categoryCount = new HashMap<>();
+        for (Order order : userOrders) {
+            for (OrderItem item : order.getItems()) {
+                if (item.getProduct() != null && item.getProduct().getCategory() != null) {
+                    String categoryName = item.getProduct().getCategory().getName();
+                    categoryCount.put(categoryName, categoryCount.getOrDefault(categoryName, 0) + 1);
+                }
+            }
+        }
+
+        // Get top 3 category names
+        return categoryCount.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .limit(3)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
+
+    private String determineLoyaltyTier(BigDecimal totalSpent) {
+        if (totalSpent.compareTo(new BigDecimal("1000")) >= 0) {
+            return "Gold";
+        } else if (totalSpent.compareTo(new BigDecimal("500")) >= 0) {
+            return "Silver";
+        } else if (totalSpent.compareTo(new BigDecimal("100")) >= 0) {
+            return "Bronze";
+        } else {
+            return "New Customer";
+        }
+    }
     private void setUserAnalytics(Analytics analytics) {
         List<User> users = userRepository.findAll();
 

@@ -1,6 +1,8 @@
 package com.example.ecommerce.service;
 
 import com.example.ecommerce.dto.AnalyticsDto;
+import com.example.ecommerce.dto.UserAnalyticsDto;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -15,4 +17,6 @@ public interface AnalyticsService {
     AnalyticsDto generateDailyAnalytics();
 
     void saveDailyAnalytics();
+
+    UserAnalyticsDto getUserAnalytics(Long userId);
 }

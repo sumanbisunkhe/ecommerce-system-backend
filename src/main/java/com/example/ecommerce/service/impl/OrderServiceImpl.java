@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -136,6 +137,12 @@ public class OrderServiceImpl implements OrderService {
     public void deleteOrder(Long id) {
         if (!orderRepository.existsById(id)) {
             throw new RuntimeException("Order not found with id: " + id);
+        }
+
+        Order orders = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
+        if(orders.getPaymentStatus().equals(PaymentStatus.COMPLETED)) {
+            throw new RuntimeException("Confirmed orders cannot be deleted.");
         }
         orderRepository.deleteById(id);
     }
