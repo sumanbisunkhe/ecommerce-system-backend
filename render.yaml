@@ -1,10 +1,12 @@
 services:
   - type: web
-    name: hotshop
-    runtime: node
+    name: ecommerce-backend
+    env: docker
     plan: free
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/*.jar
+    repo: https://github.com/sumanbisunkhe/ecommerce-system-backend
+    branch: main
+    dockerfilePath: Dockerfile
+    autoDeploy: true
     envVars:
-      - key: PORT
-        value: 8080
+      - key: JAVA_TOOL_OPTIONS
+        value: "-Xms256m -Xmx512m"
