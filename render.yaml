@@ -1,12 +1,10 @@
 services:
   - type: web
     name: hotshop
-    runtime: java
+    runtime: java17  # or java21, java11, java8
     plan: free
     buildCommand: ./mvnw clean package -DskipTests
     startCommand: java -jar target/*.jar
     envVars:
       - key: PORT
         value: 8080
-      - key: JAVA_VERSION
-        value: 17
