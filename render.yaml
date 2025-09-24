@@ -1,9 +1,7 @@
 services:
   - type: web
     name: hotshop
-    runtime: image
-    image:
-      url: eclipse-temurin:17-jdk-alpine
+    runtime: node
     plan: free
     buildCommand: ./mvnw clean package -DskipTests
     startCommand: java -jar target/*.jar
