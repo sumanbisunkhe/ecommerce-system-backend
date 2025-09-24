@@ -48,6 +48,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // NEW: Find top 5 newest products
     List<Product> findTop5ByOrderByCreatedAtDesc();
 
+    List<Product> findTop8ByOrderByCreatedAtDesc();
+
+    // Add this method to the repository
+    @Query("SELECT p FROM Product p WHERE p.category.id = (SELECT p2.category.id FROM Product p2 WHERE p2.id = :productId) AND p.id != :productId")
+    Page<Product> findRelatedProductsByProductId(@Param("productId") Long productId, Pageable pageable);
+
     // NEW: Find active products
     List<Product> findByActiveTrue();
 

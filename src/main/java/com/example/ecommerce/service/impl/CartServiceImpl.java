@@ -42,12 +42,15 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartDto addProductToCart(Long userId, Long productId) {
+    public CartDto addProductToCart(Long userId, Long productId, Integer quantity) {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // Default quantity to 1 if null or invalid
+        int quantityToAdd = (quantity == null || quantity <= 0) ? 1 : quantity;
 
         // find existing cart item
         CartItem existingItem = cart.getItems().stream()
@@ -56,15 +59,15 @@ public class CartServiceImpl implements CartService {
                 .orElse(null);
 
         if (existingItem != null) {
-            existingItem.setQuantity(existingItem.getQuantity() + 1);
+            existingItem.setQuantity(existingItem.getQuantity() + quantityToAdd);
             existingItem.setTotalPrice(product.getPrice().multiply(
                     BigDecimal.valueOf(existingItem.getQuantity())));
         } else {
             CartItem newItem = CartItem.builder()
                     .cart(cart)
                     .product(product)
-                    .quantity(1)
-                    .totalPrice(product.getPrice())
+                    .quantity(quantityToAdd)
+                    .totalPrice(product.getPrice().multiply(BigDecimal.valueOf(quantityToAdd)))
                     .build();
             cart.getItems().add(newItem);
         }

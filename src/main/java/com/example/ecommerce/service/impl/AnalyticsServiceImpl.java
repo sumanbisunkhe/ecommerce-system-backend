@@ -69,6 +69,14 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Override
+    public AnalyticsDto getProductAnalytics() {
+        AnalyticsDto analyticsDto = new AnalyticsDto();
+        setOnlyProductAnalytics(analyticsDto);
+        return analyticsDto;
+    }
+
+
+    @Override
     @Transactional(readOnly = true)
     public AnalyticsDto getAnalyticsByDate(LocalDate date) {
         return analyticsRepository.findByAnalyticsDate(date)
@@ -239,6 +247,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             return "New Customer";
         }
     }
+
     private void setUserAnalytics(Analytics analytics) {
         List<User> users = userRepository.findAll();
 
@@ -336,6 +345,26 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         // Popular products (5 most bought)
         analyticsDto.setPopularProducts(orderItemRepository.findTop5ProductsByQuantity()
+                .stream()
+                .map(this::mapToProductDTO)
+                .collect(Collectors.toList()));
+    }
+
+    private void setOnlyProductAnalytics(AnalyticsDto analyticsDto) {
+        List<Product> products = productRepository.findAll();
+
+        analyticsDto.setTotalProducts(products.size());
+        analyticsDto.setActiveProducts((int) products.stream().filter(Product::getActive).count());
+        analyticsDto.setInactiveProducts((int) products.stream().filter(product -> !product.getActive()).count());
+
+        // New products (most recent 8)
+        analyticsDto.setNewProducts(productRepository.findTop8ByOrderByCreatedAtDesc()
+                .stream()
+                .map(this::mapToProductDTO)
+                .collect(Collectors.toList()));
+
+        // Popular products (8 most bought)
+        analyticsDto.setPopularProducts(orderItemRepository.findTop8ProductsByQuantity()
                 .stream()
                 .map(this::mapToProductDTO)
                 .collect(Collectors.toList()));
@@ -496,6 +525,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private int calculateAge(LocalDate birthDate, LocalDate currentDate) {
         return Period.between(birthDate, currentDate).getYears();
     }
+
     // Add this method to calculate total revenue from completed payments
     private BigDecimal calculateTotalRevenue() {
         List<Payment> completedPayments = paymentRepository.findByStatus(PaymentStatus.COMPLETED);

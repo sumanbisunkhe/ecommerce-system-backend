@@ -49,7 +49,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/payment/khalti/callback",
                                 "/auth/**",
-                                "/products/**",
+                                "/products/all",
+                                "/products/{id}/related",
+                                "/products/{id}",
+                                "/analytics/products-analytics",
+                                "/categories/**",
                                 "/public/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",

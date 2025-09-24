@@ -25,6 +25,12 @@ public class AnalyticsController {
         return ResponseEntity.ok(ApiResponse.success("System analytics retrieved successfully", analytics));
     }
 
+    @GetMapping("/products-analytics")
+    public ResponseEntity<ApiResponse<AnalyticsDto>> getProductAnalytics() {
+        AnalyticsDto analytics = analyticsService.getProductAnalytics();
+        return ResponseEntity.ok(ApiResponse.success("Product analytics retrieved successfully", analytics));
+    }
+
     @GetMapping("/date/{date}")
     public ResponseEntity<ApiResponse<AnalyticsDto>> getAnalyticsByDate(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {

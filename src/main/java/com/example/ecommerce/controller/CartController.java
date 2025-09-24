@@ -25,10 +25,14 @@ public class CartController {
     }
 
     @PostMapping("/{userId}/add/{productId}")
-    public ResponseEntity<ApiResponse<CartDto>> addProduct(@PathVariable Long userId, @PathVariable Long productId) {
-        return ResponseEntity.ok(ApiResponse.success("Product added to cart", cartService.addProductToCart(userId, productId)));
-    }
+    public ResponseEntity<ApiResponse<CartDto>> addProduct(
+            @PathVariable Long userId,
+            @PathVariable Long productId,
+            @RequestParam(required = false) Integer quantity) { // Add optional request param
 
+        return ResponseEntity.ok(ApiResponse.success("Product added to cart",
+                cartService.addProductToCart(userId, productId, quantity)));
+    }
     @DeleteMapping("/{userId}/remove/{productId}")
     public ResponseEntity<ApiResponse<CartDto>> removeProduct(@PathVariable Long userId, @PathVariable Long productId) {
         return ResponseEntity.ok(ApiResponse.success("Product removed from cart", cartService.removeProductFromCart(userId, productId)));

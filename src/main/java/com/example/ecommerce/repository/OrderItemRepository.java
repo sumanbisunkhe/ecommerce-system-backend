@@ -49,6 +49,16 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             ")")
     List<Product> findTop5ProductsByQuantity();
 
+    // NEW: Find top 8 most bought products by quantity
+    @Query("SELECT p FROM Product p " +
+            "WHERE p.id IN (" +
+            "    SELECT oi.product.id FROM OrderItem oi " +
+            "    GROUP BY oi.product.id " +
+            "    ORDER BY SUM(oi.quantity) DESC " +
+            "    LIMIT 5" +
+            ")")
+    List<Product> findTop8ProductsByQuantity();
+
     // NEW: Find order items by order ID
     List<OrderItem> findByOrderId(Long orderId);
 

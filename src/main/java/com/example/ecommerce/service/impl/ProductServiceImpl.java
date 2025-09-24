@@ -8,6 +8,7 @@ import com.example.ecommerce.service.FileUploadService;
 import com.example.ecommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +17,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -136,5 +139,24 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Product not found with id: " + id);
         }
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ProductDto> getRelatedProducts(Long productId, int limit) {
+        // Get the product to ensure it exists
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+
+        // If product has no category, return empty list
+        if (product.getCategory() == null) {
+            return List.of();
+        }
+
+        Pageable pageable = PageRequest.of(0, limit);
+        Page<Product> relatedProducts = productRepository.findRelatedProductsByProductId(productId, pageable);
+
+        return relatedProducts.getContent().stream()
+                .map(productMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

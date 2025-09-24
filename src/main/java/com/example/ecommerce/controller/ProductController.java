@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -94,5 +95,17 @@ public class ProductController {
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.ok(ApiResponse.success("Product deleted successfully", null));
+    }
+
+    @GetMapping("/{id}/related")
+    public ResponseEntity<ApiResponse<List<ProductDto>>> getRelatedProducts(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "8") int limit) {
+
+        List<ProductDto> relatedProducts = productService.getRelatedProducts(id, limit);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Related products retrieved successfully", relatedProducts)
+        );
     }
 }

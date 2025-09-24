@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface ProductService {
     ProductDto createProduct(ProductDto dto, MultipartFile image) throws IOException;
@@ -27,4 +28,7 @@ public interface ProductService {
                                     Pageable pageable);
 
     void deleteProduct(Long id);
+
+    List<ProductDto> getRelatedProducts(Long productId, int limit);
+
 }
