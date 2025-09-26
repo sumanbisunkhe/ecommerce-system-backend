@@ -36,6 +36,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartDto getCartByUserId(Long userId) {
+        if (!cartRepository.existsByUserId(userId)) {
+            createCart(userId);
+        }
+
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found for user id: " + userId));
         return cartMapper.toDto(cart);
