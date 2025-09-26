@@ -43,6 +43,12 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartDto addProductToCart(Long userId, Long productId, Integer quantity) {
+
+
+        if (!cartRepository.existsByUserId(userId)) {
+            createCart(userId);
+        }
+
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
