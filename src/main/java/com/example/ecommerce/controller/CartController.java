@@ -24,6 +24,11 @@ public class CartController {
         return ResponseEntity.ok(ApiResponse.success("Cart retrieved", cartService.getCartByUserId(userId)));
     }
 
+    @GetMapping("/items/{userId}")
+    public ResponseEntity<ApiResponse<Integer>> itemsInCart(@PathVariable Long userId) {
+        return ResponseEntity.ok(ApiResponse.success("Cart retrieved", cartService.noOfCartItems(userId)));
+    }
+
     @PostMapping("/{userId}/add/{productId}")
     public ResponseEntity<ApiResponse<CartDto>> addProduct(
             @PathVariable Long userId,

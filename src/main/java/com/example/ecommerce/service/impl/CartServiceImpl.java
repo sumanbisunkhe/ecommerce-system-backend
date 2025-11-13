@@ -147,4 +147,11 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
     }
 
+    @Override
+    public Integer noOfCartItems(Long userId) {
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Cart not found for user id: " + userId));
+        return cart.getTotalItems();
+    }
+
 }
